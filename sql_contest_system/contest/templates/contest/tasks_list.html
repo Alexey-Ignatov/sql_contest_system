@@ -6,7 +6,7 @@
 
     {% for task in tasks %}
         <div>
-            <p>Задание: <a href ="{% url 'task_details' task.id%}">{{ task.title}}</p>
+            <p><a href ="{% url 'task_details' task.id%}">{{task}}</p>
         </div>
     {% endfor %}
 

@@ -45,9 +45,6 @@ def task_details(request, task_id):
         form = SubmissionForm()
 
 
-
-
-
     return render(request, 'contest/task_details.html', {'task':task, 'form':form})
 
 

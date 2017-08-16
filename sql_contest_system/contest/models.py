@@ -4,9 +4,8 @@ from __future__ import unicode_literals
 from django.db import models
 
 # Create your models here.
-class Task(models.Model):
+class ModuleTaskSet(models.Model):
     title = models.CharField(verbose_name=u'Название', max_length=200)
-    formulation = models.TextField(verbose_name=u'Формулировка')
     order_in_course = models.IntegerField(verbose_name=u'Номер задания')
 
     class Meta:
@@ -16,6 +15,23 @@ class Task(models.Model):
 
     def __unicode__(self):
         return self.title
+
+
+
+class Task(models.Model):
+    title = models.CharField(verbose_name=u'Название', max_length=200)
+    formulation = models.TextField(verbose_name=u'Формулировка')
+    module_task_set = models.ForeignKey(verbose_name=u'Задание', to=ModuleTaskSet)
+
+    class Meta:
+        ordering = ('title',)
+        verbose_name = u'Задача'
+        verbose_name_plural = u'Задача'
+
+    def __unicode__(self):
+        return self.module_task_set.title + ": " +  self.title
+
+
 
 
 
@@ -48,9 +64,15 @@ class Students_profile(models.Model):
 
 
 class Task_deadline(models.Model):
-    task = models.ForeignKey(verbose_name=u'Задание',to=Task)
+    DEADLINE_TYPES = (
+        (0, u'Первый срок'),
+        (1, u'Второй срок')
+    )
+
+    task = models.ForeignKey(verbose_name=u'Задание',to=ModuleTaskSet)
     group = models.ForeignKey(verbose_name=u'Группа', to=Student_group)
     deadline = models.DateTimeField(verbose_name=u'Срок сдачи')
+    deadline_type = models.IntegerField(verbose_name=u'Вид срока', choices=DEADLINE_TYPES)
 
     class Meta:
         ordering = ('task', 'group')
@@ -62,11 +84,11 @@ class Task_deadline(models.Model):
 
 
 class Task_submission(models.Model):
-    task = models.ForeignKey(verbose_name=u'Задание', to=Task)
+    task = models.ForeignKey(verbose_name=u'Задача', to=Task)
     student = models.ForeignKey(verbose_name=u'Студент', to=Students_profile)
 
     solution = models.TextField(verbose_name=u'Решение')
-
+    evaluation = models.PositiveIntegerField( verbose_name=u'Оценка',blank=True, default=None)
     class Meta:
         ordering = ('student', 'task')
         verbose_name = u'Посылка решения'
