@@ -63,6 +63,22 @@ class Students_profile(models.Model):
         return self.first_name +' ' +self.last_name
 
 
+
+
+class Professor_profile(models.Model):
+    first_name = models.CharField(verbose_name=u'Имя', max_length=200)
+    last_name = models.CharField(verbose_name=u'Фамилия', max_length=200)
+
+    class Meta:
+        ordering = ('first_name', 'last_name')
+        verbose_name = u'Преподаватель'
+        verbose_name_plural = u'Преподаватели'
+
+    def __unicode__(self):
+        return self.first_name +' ' +self.last_name
+
+
+
 class Task_deadline(models.Model):
     DEADLINE_TYPES = (
         (0, u'Первый срок'),
@@ -88,7 +104,7 @@ class Task_submission(models.Model):
     student = models.ForeignKey(verbose_name=u'Студент', to=Students_profile)
 
     solution = models.TextField(verbose_name=u'Решение')
-    evaluation = models.PositiveIntegerField( verbose_name=u'Оценка',blank=True, default=None)
+    evaluation = models.PositiveIntegerField( verbose_name=u'Оценка',blank=True, null=True)
     class Meta:
         ordering = ('student', 'task')
         verbose_name = u'Посылка решения'
@@ -96,3 +112,22 @@ class Task_submission(models.Model):
 
     def __unicode__(self):
         return self.student.__unicode__() + ' ' + self.task.__unicode__()
+
+
+
+
+class SubmissionGrade(models.Model):
+    task_subm = models.ForeignKey(verbose_name=u'Решение', to=Task_submission)
+    evaluation_date = models.DateTimeField(verbose_name=u'Дата оценки')
+
+    person = models.ForeignKey(verbose_name=u'Преподаватель', to=Professor_profile)
+
+    grade = models.PositiveIntegerField(verbose_name=u'Оценка')
+
+    class Meta:
+        ordering = ('task_subm', 'evaluation_date')
+        verbose_name = u'Оценка решения'
+        verbose_name_plural = u'Оценки'
+
+    def __unicode__(self):
+        return self.task_subm.__unicode__() + ' ' + self.evaluation_date.__unicode__()
