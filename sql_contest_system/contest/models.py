@@ -2,6 +2,7 @@
 from __future__ import unicode_literals
 
 from django.db import models
+from django.contrib.auth.models import User
 
 # Create your models here.
 class ModuleTaskSet(models.Model):
@@ -50,9 +51,10 @@ class Student_group(models.Model):
 
 class Students_profile(models.Model):
     first_name = models.CharField(verbose_name=u'Имя', max_length=200)
-    last_name = models.CharField(verbose_name=u'Фамилия', max_length=200)
+    last_name  = models.CharField(verbose_name=u'Фамилия', max_length=200)
 
     student_group = models.ForeignKey(to=Student_group)
+    system_user = models.OneToOneField(to=User)
 
     class Meta:
         ordering = ('first_name', 'last_name')
@@ -105,6 +107,8 @@ class Task_submission(models.Model):
 
     solution = models.TextField(verbose_name=u'Решение')
     evaluation = models.PositiveIntegerField( verbose_name=u'Оценка',blank=True, null=True)
+    subm_time = models.DateTimeField(verbose_name=u'Время отправки')
+
     class Meta:
         ordering = ('student', 'task')
         verbose_name = u'Посылка решения'

@@ -1,9 +1,13 @@
 {% extends 'contest/main.html' %}
 {% block content %}
+<div class="row">
+    <div class="large-offset-3 large-6 columns end">
+        <h1>{{task}}</h1>
+        <form method="POST" class="post-form">
+            {{ form.as_p }}
+        <input type="submit" class="button" value="Сохранить решение">
+        </form>
 
-    <h1>{{task}}</h1>
-    <form method="POST" class="post-form">{% csrf_token %}
-        {{ form.as_p }}
-    <input type="submit" class="button" value="Сохранить решение">
-    </form>
+    </div >
+</div >
 {% endblock %}

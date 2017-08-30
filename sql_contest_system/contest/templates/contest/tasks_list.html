@@ -4,10 +4,30 @@
         <h1><a href= "" >Список задач</a></h1>
     </div>
 
+    <div>
+        <h3> Привет, {{student}}!</h1>
+    </div>
+
+<table>
+  <thead>
+    <tr>
+      <th width="200">Задание</th>
+      <th>Задача</th>
+      <th width="150">Результ</th>
+    </tr>
+  </thead>
+  <tbody>
+
+
     {% for task in tasks %}
-        <div>
-            <p><a href ="{% url 'task_details' task.id%}">{{task}}</p>
-        </div>
+        <tr>
+          <td>{{task.tasks_set}}</td>
+          <td><p><a href ="{% url 'task_details' task.task_id%}">{{task.task}}</p></td>
+          <td>{{task.grade}}</td>
     {% endfor %}
+
+  </tbody>
+</table>
+
 
 {% endblock %}
