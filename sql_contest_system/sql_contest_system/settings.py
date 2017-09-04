@@ -22,7 +22,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SECRET_KEY = '#-9&j0)p)$9fthl6iicm4vzslpi6n0i98$6-8+iii#!1pla45m'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
 
 
@@ -122,7 +122,6 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 STATICFILES_DIRS = (
-    ('static', '/Users/alexey/workspace/sql_contest_system/sql_contest_system/static'),
+    ('static', os.path.join(BASE_DIR, "static")),
+
 )
-print os.path.join(BASE_DIR, "static")
-print os.path.join(BASE_DIR, "static")
