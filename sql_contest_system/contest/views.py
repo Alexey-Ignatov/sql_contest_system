@@ -48,7 +48,7 @@ def tasks_list(request):
             'tasks_set':sub.task.module_task_set.title,
             'task':sub.task.title,
             'task_id': sub.task.id,
-            'grade':sub.evaluation.grade if sub.evaluation else -1,
+            'grade':sub.evaluation.grade if sub.evaluation else u'На проверке',
             'subm_time':sub.subm_time
         }
         subs_info_list.append(sub_dict)
@@ -84,8 +84,12 @@ def tasks_list(request):
     task_df = task_df.join(subs_df.grade)
     task_df = task_df.join(dl1_df.deadline.rename('deadline1'), on= 'tasks_set_id')
     task_df = task_df.join(dl2_df.deadline.rename('deadline2'), on= 'tasks_set_id')
+    task_df.grade.fillna(u'Нет рещений',inplace = True)
+    task_df.deadline1.fillna(u'Не задан',inplace = True)
+    task_df.deadline2.fillna(u'Не задан',inplace = True)
 
-    print(dl1_df.deadline.rename('deadline1'), 'dl1_df.deadline.rename')
+
+    #print(dl1_df.deadline.rename('deadline1'), 'dl1_df.deadline.rename')
     list_of_rows = [Row(task=r.loc['task'],
                         task_id=ind,
                         tasks_set=r.loc['tasks_set'],
@@ -94,7 +98,7 @@ def tasks_list(request):
                         deadline2=r.loc['deadline2'],
                         ) for ind, r in task_df.iterrows()]
 
-    print(task_df)
+    #print(task_df)
     return render(request, 'contest/tasks_list.html', {'tasks':list_of_rows,
                                                        'username': auth.get_user(request).username,
                                                        'student': student,
@@ -114,19 +118,31 @@ def task_details(request, task_id):
     except Students_profile.DoesNotExist:
         raise Http404
 
-    d_line1 = Task_deadline_first.objects.get(group = student.student_group, task = task.module_task_set)
-    d_line2 = Task_deadline_last.objects.get(group = student.student_group, task = task.module_task_set)
+    try:
+        d_line1 = Task_deadline_first.objects.get(group = student.student_group, task = task.module_task_set)
+    except Task_deadline_first.DoesNotExist:
+        return render(request, 'contest/task_details.html', {'task': task, 'form': None,'post':False,
+                                                             'username': auth.get_user(request).username, })
+
+    try:
+        d_line2 = Task_deadline_last.objects.get(group = student.student_group, task = task.module_task_set)
+    except Task_deadline_last.DoesNotExist:
+        return render(request, 'contest/task_details.html', {'task': task, 'form': None,'post':False,
+                                                             'username': auth.get_user(request).username, })
+
 
 
 
     if request.method == "POST":
         form = SubmissionForm(request.POST)
-        if form.is_valid():
-            post = form.save(commit=False)
-            post.task = task
-            post.subm_time = timezone.now()
-            post.student = student
-            post.save()
+        if (not Task_submission.objects.filter(student=student, task=task).exists() and timezone.now() < d_line1.deadline)\
+        or timezone.now() > d_line2.deadline:
+            if form.is_valid():
+                post = form.save(commit=False)
+                post.task = task
+                post.subm_time = timezone.now()
+                post.student = student
+                post.save()
 
     else:
         form = SubmissionForm()
@@ -137,7 +153,7 @@ def task_details(request, task_id):
         return render(request, 'contest/task_details.html', {'task':task, 'form':form,
                                                        'username': auth.get_user(request).username,})
     else:
-        return render(request, 'contest/task_details.html', {'task': task, 'form': None,
+        return render(request, 'contest/task_details.html', {'task': task, 'form': None,'post':request.method == "POST",
                                                              'username': auth.get_user(request).username, })
 
 
