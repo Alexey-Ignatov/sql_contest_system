@@ -122,7 +122,7 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 STATICFILES_DIRS = (
-    ('static', os.path.join(BASE_DIR, "static")),
-    
+    ('static', '/Users/alexey/workspace/sql_contest_system/sql_contest_system/static'),
 )
+print os.path.join(BASE_DIR, "static")
 print os.path.join(BASE_DIR, "static")
