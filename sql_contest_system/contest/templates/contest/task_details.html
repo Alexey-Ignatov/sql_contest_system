@@ -1,13 +1,17 @@
 {% extends 'contest/main.html' %}
 {% block content %}
 <div class="row">
-    <div class="large-offset-3 large-6 columns end">
-        <h1>{{task}}</h1>
+    <div class="large-offset-2 large-8 columns end">
+        <h2>{{task}}</h2>
+        {% if  form %}
         <form method="POST" class="post-form">
             {{ form.as_p }}
+
         <input type="submit" class="button" value="Сохранить решение">
         </form>
-
+        {% else %}
+         Задание не может быть отправлено.
+        {% endif %}
     </div >
 </div >
 {% endblock %}

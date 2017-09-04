@@ -52,6 +52,7 @@ class Student_group(models.Model):
 class Students_profile(models.Model):
     first_name = models.CharField(verbose_name=u'Имя', max_length=200)
     last_name  = models.CharField(verbose_name=u'Фамилия', max_length=200)
+    patronymic = models.CharField(verbose_name=u'Фамилия', max_length=200)
 
     student_group = models.ForeignKey(to=Student_group)
     system_user = models.OneToOneField(to=User)
@@ -70,7 +71,9 @@ class Students_profile(models.Model):
 class Professor_profile(models.Model):
     first_name = models.CharField(verbose_name=u'Имя', max_length=200)
     last_name = models.CharField(verbose_name=u'Фамилия', max_length=200)
+    patronymic = models.CharField(verbose_name=u'Фамилия', max_length=200)
 
+    system_user = models.OneToOneField(to=User)
     class Meta:
         ordering = ('first_name', 'last_name')
         verbose_name = u'Преподаватель'
@@ -81,24 +84,36 @@ class Professor_profile(models.Model):
 
 
 
-class Task_deadline(models.Model):
-    DEADLINE_TYPES = (
-        (0, u'Первый срок'),
-        (1, u'Второй срок')
-    )
+class Task_deadline_first(models.Model):
 
     task = models.ForeignKey(verbose_name=u'Задание',to=ModuleTaskSet)
     group = models.ForeignKey(verbose_name=u'Группа', to=Student_group)
     deadline = models.DateTimeField(verbose_name=u'Срок сдачи')
-    deadline_type = models.IntegerField(verbose_name=u'Вид срока', choices=DEADLINE_TYPES)
+
 
     class Meta:
         ordering = ('task', 'group')
-        verbose_name = u'Срок сдачи'
-        verbose_name_plural = u'Сроки сдачи'
+        verbose_name = u'Первый срок сдачи'
+        verbose_name_plural = u'Первые сроки'
 
     def __unicode__(self):
         return self.task.title + ' ' + str(self.group)
+
+
+class Task_deadline_last(models.Model):
+    task = models.ForeignKey(verbose_name=u'Задание',to=ModuleTaskSet)
+    group = models.ForeignKey(verbose_name=u'Группа', to=Student_group)
+    deadline = models.DateTimeField(verbose_name=u'Срок сдачи')
+
+
+    class Meta:
+        ordering = ('task', 'group')
+        verbose_name = u'Второй срок сдачи'
+        verbose_name_plural = u'Вторые сроки'
+
+    def __unicode__(self):
+        return self.task.title + ' ' + str(self.group)
+
 
 
 class Task_submission(models.Model):
