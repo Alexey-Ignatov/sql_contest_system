@@ -125,4 +125,4 @@ STATICFILES_DIRS = (
     ('static', os.path.join(BASE_DIR, "static")),
     
 )
-os.path.join(BASE_DIR, "static")
+print os.path.join(BASE_DIR, "static")
