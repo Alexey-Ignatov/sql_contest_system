@@ -52,7 +52,7 @@ class Student_group(models.Model):
 class Students_profile(models.Model):
     first_name = models.CharField(verbose_name=u'Имя', max_length=200)
     last_name  = models.CharField(verbose_name=u'Фамилия', max_length=200)
-    patronymic = models.CharField(verbose_name=u'Фамилия', max_length=200)
+    patronymic = models.CharField(verbose_name=u'Отчество', max_length=200)
 
     student_group = models.ForeignKey(to=Student_group)
     system_user = models.OneToOneField(to=User)

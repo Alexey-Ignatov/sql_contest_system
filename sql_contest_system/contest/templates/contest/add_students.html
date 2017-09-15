@@ -1,0 +1,9 @@
+{% extends 'contest/main.html' %}
+{% block content %}
+    <form method="POST" class="post-form">
+            Скопируйте таблицу пользователей из Excel
+            {{ form.as_p }}
+        <input type="submit" class="button" value="Сохранить решение">
+        </form>
+    </form>
+{% endblock %}

@@ -7,21 +7,36 @@ from django.utils import timezone
 from django.shortcuts import render, redirect
 from django.utils import timezone
 from .models import Task, Students_profile, Task_submission, Professor_profile, \
-    Task_deadline_last, Task_deadline_first
+    Task_deadline_last, Task_deadline_first, Student_group
 from django.http import Http404
-from .forms import SubmissionForm
+from .forms import SubmissionForm, AddUsersForm
 from django.contrib import auth
 from django.contrib import auth
 from django.contrib.auth.decorators import login_required
 import pandas as pd
 from datetime import datetime
 import collections
+from django.contrib.auth.models import User
+
+import sys
+if sys.version_info[0] < 3:
+    from StringIO import StringIO
+else:
+    from io import StringIO
+
+
 Row = collections.namedtuple('Row','task task_id tasks_set grade deadline1 deadline2')
 
 @login_required(login_url='/auth/login')
 def tasks_list(request):
     curr_user = auth.get_user(request)
-    student = Students_profile.objects.get(system_user = curr_user)
+
+    try:
+        student = Students_profile.objects.get(system_user=curr_user)
+    except Students_profile.DoesNotExist:
+        raise Http404
+
+
     tasks = Task.objects.all()
     subs = Task_submission.objects.filter(student = student)
 
@@ -84,7 +99,7 @@ def tasks_list(request):
     task_df = task_df.join(subs_df.grade)
     task_df = task_df.join(dl1_df.deadline.rename('deadline1'), on= 'tasks_set_id')
     task_df = task_df.join(dl2_df.deadline.rename('deadline2'), on= 'tasks_set_id')
-    task_df.grade.fillna(u'Нет рещений',inplace = True)
+    task_df.grade.fillna(u'Нет решений',inplace = True)
     task_df.deadline1.fillna(u'Не задан',inplace = True)
     task_df.deadline2.fillna(u'Не задан',inplace = True)
 
@@ -175,5 +190,67 @@ def home(request):
 
 
     return render(request, 'contest/prof_home.html', {'username': auth.get_user(request).username,})
+
+
+@login_required(login_url='/auth/login')
+def add_students(request):
+    curr_user = auth.get_user(request)
+
+    try:
+        student = Students_profile.objects.get(system_user=curr_user)
+        if student:
+            return redirect('tasks_list')
+    except Students_profile.DoesNotExist:
+        try:
+            prof = Professor_profile.objects.get(system_user=curr_user)
+        except Professor_profile.DoesNotExist:
+            return redirect('/auth/logout')
+            raise Http404
+
+
+    if request.method=='POST':
+        form = AddUsersForm(request.POST)
+        if form.is_valid():
+            cd = form.cleaned_data
+            #now in the object cd, you have the form as a dictionary.
+            csv_str = cd.get('table')
+            df = pd.read_csv(StringIO(csv_str), sep="\t")
+
+            if not set(['user_name','password',	'first_name', 'last_name','patronymic','group']) <=set(df.columns.tolist()):
+                return render(request, 'contest/message.html', {'message':u'Введенные данные некорректны' })
+
+            if df.user_name.unique().shape[0] != df.user_name.shape[0]:
+                return render(request, 'contest/message.html', {'message':u'Введенные данные некорректны' })
+
+            for ind, row in df.iterrows():
+
+                try:
+                    User.objects.get(username=row['user_name'])
+                    return render(request, 'contest/message.html',
+                                  {'message': u'Пользователь ' + str(row['user_name']) + u' уже существует'})
+                except User.DoesNotExist:
+                    pass
+
+                user = User.objects.create_user(row['user_name'], '', row['password'])
+                try:
+                    group = Student_group.objects.get(number=row['group'])
+                except Student_group.DoesNotExist:
+                    group = Student_group(number=row['group'])
+                group.save()
+                student = Students_profile(first_name = row['first_name'],
+                                           last_name=row['last_name'],
+                                           patronymic=row['patronymic'],
+                                           student_group=group,
+                                           system_user = user
+                                           )
+                student.save()
+            return render(request, 'contest/message.html', {'message': u'Пользователи созданы успешно'})
+    else:
+        form = AddUsersForm()
+
+
+    return render(request, 'contest/add_students.html', {'username': auth.get_user(request).username,
+                                                      'form':form})
+
 
 
