@@ -95,7 +95,7 @@ def tasks_list(request):
     subs_df = pd.DataFrame(subs_info_list)  if subs_info_list else pd.DataFrame([], columns=['tasks_set','task', 'task_id','grade','subm_time'])
     subs_df = subs_df.sort_values('subm_time').groupby('task_id').last()
 
-
+    
     task_df = task_df.join(subs_df.grade)
     task_df = task_df.join(dl1_df.deadline.rename('deadline1'), on= 'tasks_set_id')
     task_df = task_df.join(dl2_df.deadline.rename('deadline2'), on= 'tasks_set_id')
@@ -215,31 +215,32 @@ def add_students(request):
             #now in the object cd, you have the form as a dictionary.
             csv_str = cd.get('table')
             df = pd.read_csv(StringIO(csv_str), sep="\t")
+            df.columns = [i.decode('utf-8') for i in df.columns.tolist()]
 
-            if not set(['user_name','password',	'first_name', 'last_name','patronymic','group']) <=set(df.columns.tolist()):
-                return render(request, 'contest/message.html', {'message':u'Введенные данные некорректны' })
+            if not set([u'Фамилия',u'Имя',u'Отчество', 'login','pswd',u'группа']) <=set(df.columns.tolist()):
+                return render(request, 'contest/message.html', {'message':u'Введенные данные некорректны. Нет необходимых колонок.' })
 
-            if df.user_name.unique().shape[0] != df.user_name.shape[0]:
-                return render(request, 'contest/message.html', {'message':u'Введенные данные некорректны' })
+            if df.login.unique().shape[0] != df.login.shape[0]:
+                return render(request, 'contest/message.html', {'message':u'Введенные данные некорректны. Имена пользователей не уникальны.' })
 
             for ind, row in df.iterrows():
 
                 try:
-                    User.objects.get(username=row['user_name'])
+                    User.objects.get(username=row['login'])
                     return render(request, 'contest/message.html',
-                                  {'message': u'Пользователь ' + str(row['user_name']) + u' уже существует'})
+                                  {'message': u'Пользователь ' + str(row['login']) + u' уже существует'})
                 except User.DoesNotExist:
                     pass
 
-                user = User.objects.create_user(row['user_name'], '', row['password'])
+                user = User.objects.create_user(row['login'], '', row['pswd'])
                 try:
-                    group = Student_group.objects.get(number=row['group'])
+                    group = Student_group.objects.get(number=row[u'группа'])
                 except Student_group.DoesNotExist:
-                    group = Student_group(number=row['group'])
+                    group = Student_group(number=row[u'группа'])
                 group.save()
-                student = Students_profile(first_name = row['first_name'],
-                                           last_name=row['last_name'],
-                                           patronymic=row['patronymic'],
+                student = Students_profile(first_name = row[u'Имя'],
+                                           last_name=row[u'Фамилия'],
+                                           patronymic=row[u'Отчество'],
                                            student_group=group,
                                            system_user = user
                                            )
