@@ -53,6 +53,7 @@ class Students_profile(models.Model):
     first_name = models.CharField(verbose_name=u'Имя', max_length=200)
     last_name  = models.CharField(verbose_name=u'Фамилия', max_length=200)
     patronymic = models.CharField(verbose_name=u'Отчество', max_length=200)
+    no_in_group =  models.IntegerField(verbose_name= u'Номер в группе')
 
     student_group = models.ForeignKey(to=Student_group)
     system_user = models.OneToOneField(to=User)
