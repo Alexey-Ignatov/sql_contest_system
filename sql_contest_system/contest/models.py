@@ -37,15 +37,15 @@ class Task(models.Model):
 
 
 class Student_group(models.Model):
-    number = models.IntegerField(verbose_name=u'Номер группы')
+    title = models.CharField(verbose_name=u'Название группы', max_length=200)
 
     class Meta:
-        ordering = ('number',)
+        ordering = ('title',)
         verbose_name = u'Группа'
         verbose_name_plural = u'Группы'
 
     def __unicode__(self):
-        return str(self.number)
+        return self.title
 
 
 
@@ -71,7 +71,7 @@ class Students_profile(models.Model):
 class Professor_profile(models.Model):
     first_name = models.CharField(verbose_name=u'Имя', max_length=200)
     last_name = models.CharField(verbose_name=u'Фамилия', max_length=200)
-    patronymic = models.CharField(verbose_name=u'Фамилия', max_length=200)
+    patronymic = models.CharField(verbose_name=u'Отчество', max_length=200)
 
     system_user = models.OneToOneField(to=User)
     class Meta:
@@ -97,7 +97,7 @@ class Task_deadline_first(models.Model):
         verbose_name_plural = u'Первые сроки'
 
     def __unicode__(self):
-        return self.task.title + ' ' + str(self.group)
+        return self.task.title + u' Группа: ' + self.group.title
 
 
 class Task_deadline_last(models.Model):
@@ -112,7 +112,7 @@ class Task_deadline_last(models.Model):
         verbose_name_plural = u'Вторые сроки'
 
     def __unicode__(self):
-        return self.task.title + ' ' + str(self.group)
+        return self.task.title + u' Группа: ' + self.group.title
 
 
 

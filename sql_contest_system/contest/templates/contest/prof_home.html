@@ -1,4 +1,25 @@
 {% extends 'contest/main.html' %}
 {% block content %}
+
+<table>
+  <thead>
+    <tr>
+      <th width="1000">Управление группами</th>
+    </tr>
+  </thead>
+  <tbody>
+
+
+    {% for group in groups %}
+        <tr>
+          <td><p><a href ="{% url 'group_details' group.id%}">{{group.title}}</p></td>
+        </tr>
+
+    {% endfor %}
+
+  </tbody>
+</table>
+
+
  <h4><a href= "/add_students" >Добавить студентов</a></h4>
 {% endblock %}

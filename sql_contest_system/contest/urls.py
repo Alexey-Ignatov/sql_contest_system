@@ -6,6 +6,7 @@ urlpatterns = [
     url(r'^home/$', views.home, name='home'),
     url(r'^add_students/$', views.add_students, name='add_students'),
     url(r'^task_details/(?P<task_id>\d+)/$', views.task_details, name='task_details'),
+    url(r'^group_details/(?P<group_id>\d+)/$', views.group_details, name='group_details'),
     url('^$',  views.home)
 ]
 
