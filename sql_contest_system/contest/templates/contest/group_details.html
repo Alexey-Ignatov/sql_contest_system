@@ -4,29 +4,20 @@
 <table>
   <thead>
     <tr>
-        <th width="200">Фамилия</th>
-        <th width="200">Имя</th>
-        <th width="200">Отчество</th>
-      <th width="200">Задание</th>
-      <th>Задача</th>
-      <th>Срок 1</th>
-      <th>Срок 2</th>
-      <th width="150">Результ</th>
+        {% for colname in tasks.columns %}
+          <th width="200">{{colname}}</th>
+       {% endfor %}
     </tr>
   </thead>
   <tbody>
 
 
-    {% for task in tasks %}
-        <tr>
-          <td>{{task.last_name}}</td>
-          <td>{{task.first_name}}</td>
-          <td>{{task.patronymic}}</td>
-          <td>{{task.tasks_set}}</td>
-          <td>{{task.task}}</td>
-          <td>{{task.deadline1}}</td>
-          <td>{{task.deadline2}}</td>
-          <td>{{task.grade}}</td>
+    {% for ind, row in tasks.iterrows %}
+      <tr>
+        {% for ind, val in row.iteritems %}
+
+          <td>{{val}}</td>
+        {% endfor %}
     {% endfor %}
 
   </tbody>

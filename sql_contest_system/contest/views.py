@@ -256,8 +256,7 @@ def group_details(request, group_id):
                                                                                                'tasks_set_id'])
     #task_df.set_index(u'task_id', inplace=True)
 
-    subs_df = pd.DataFrame(subs_info_list) if subs_info_list else pd.DataFrame([],
-                                                                               columns=['tasks_set', 'task', 'task_id',
+    subs_df = pd.DataFrame(subs_info_list) if subs_info_list else pd.DataFrame([], columns=['tasks_set', 'task', 'task_id',
                                                                                         'grade', 'subm_time','student_id'])
 
     subs_df = subs_df.sort_values('subm_time').groupby(['student_id','task_id']).last().reset_index()
@@ -265,28 +264,25 @@ def group_details(request, group_id):
     task_df['dumm'] = 1
     students_df['dumm'] = 1
 
-    task_df = pd.merge(students_df,task_df,  left_on='dumm',  right_on='dumm', how='outer')
-    task_df = pd.merge(subs_df[['task_id','grade', 'student_id']], task_df, left_on=['task_id', 'student_id'], right_on= ['task_id', 'student_id'], how='outer')
-    task_df = task_df.join(dl1_df.deadline.rename('deadline1'), on='tasks_set_id', how = 'right')
-    task_df = task_df.join(dl2_df.deadline.rename('deadline2'), on='tasks_set_id')
-    task_df.grade.fillna(u'Нет решений', inplace=True)
-    task_df.deadline1.fillna(u'Не задан', inplace=True)
-    task_df.deadline2.fillna(u'Не задан', inplace=True)
+    out_df = pd.merge(students_df,task_df,  left_on='dumm',  right_on='dumm', how='outer')
+    out_df = pd.merge(subs_df[['task_id','grade', 'student_id']], out_df, left_on=['task_id', 'student_id'], right_on= ['task_id', 'student_id'], how='outer')
+    out_df = out_df.join(dl1_df.deadline.rename('deadline1'), on='tasks_set_id', how = 'right')
+    out_df = out_df.join(dl2_df.deadline.rename('deadline2'), on='tasks_set_id')
+    out_df.grade.fillna(u'Нет решений', inplace=True)
+    out_df.deadline1.fillna(u'Не задан', inplace=True)
+    out_df.deadline2.fillna(u'Не задан', inplace=True)
 
-    # print(dl1_df.deadline.rename('deadline1'), 'dl1_df.deadline.rename')
-    list_of_rows = [Row_tasks_list_prof(task=r.loc['task'],
-                                   task_id=None,
-                                   tasks_set=r.loc['tasks_set'],
-                                   grade=r.loc['grade'],
-                                   deadline1=r.loc['deadline1'],
-                                   deadline2=r.loc['deadline2'],
-                                   first_name= r.loc['first_name'],
-                                   last_name = r.loc['last_name'],
-                                   patronymic= r.loc['patronymic']
-                                   ) for ind, r in task_df.iterrows()]
 
+    transformed = out_df.pivot(index='student_id', columns='task_id', values='grade')
+    task_final_names =  task_df.set_index('task_id').apply(lambda x: x.tasks_set + ' '+ x.task, 1)
+
+    transformed.columns = [task_final_names[x] if x in task_final_names.index else x for x in transformed.columns ]
+    out_df = pd.merge(students_df, transformed, left_on='student_id', right_index=True, how='inner')
+
+    out_df = out_df.drop(['student_id', 'dumm'], 1)
+    out_df = out_df.sort_values(['last_name'])
     # print(task_df)
-    return render(request, 'contest/group_details.html', {'tasks': list_of_rows,
+    return render(request, 'contest/group_details.html', {'tasks': out_df,
                                                        'username': auth.get_user(request).username,
                                                        'subs': subs})
 
