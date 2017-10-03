@@ -7,7 +7,7 @@ from django.utils import timezone
 from django.shortcuts import render, redirect
 from django.utils import timezone
 from .models import Task, Students_profile, Task_submission, Professor_profile, \
-    Task_deadline_last, Task_deadline_first, Student_group, ModuleTaskSet
+    Task_deadline_last, Task_deadline_first, Student_group, ModuleTaskSet,SubmissionGrade
 from django.http import Http404
 from .forms import SubmissionForm, AddUsersForm
 from django.contrib import auth
@@ -24,6 +24,103 @@ if sys.version_info[0] < 3:
 else:
     from io import StringIO
 
+
+
+import os
+import zipfile
+import StringIO
+
+from django.http import HttpResponse
+
+
+def get_subms(request, group_id, tasks_set_id):
+
+    try:
+        group = Student_group.objects.get(id = group_id)
+    except group.DoesNotExist:
+        raise Http404
+
+
+    try:
+        tasks_set = ModuleTaskSet.objects.get(id = tasks_set_id)
+    except ModuleTaskSet.DoesNotExist:
+        raise Http404
+
+
+
+    students = Students_profile.objects.filter(student_group=group)
+    dir_with_files_name ='./subm_downloads_' + str(timezone.now())
+    os.mkdir(dir_with_files_name)
+
+
+    for student in students:
+        subs = Task_submission.objects.filter(student=student)
+
+        subs_info_list = []
+        for sub in subs:
+            if sub.task.module_task_set == tasks_set:
+                sub_dict = {
+                    'tasks_set': sub.task.module_task_set.title,
+                    'task': sub.task.title,
+                    'task_id': sub.task.id,
+                    'grade': sub.evaluation.grade if sub.evaluation else u'Не проверено',
+                    'subm_time': sub.subm_time,
+                    'solution': sub.solution,
+                    'sub_id':sub.id
+                }
+                subs_info_list.append(sub_dict)
+
+
+        subs_df = pd.DataFrame(subs_info_list) if subs_info_list else pd.DataFrame([], columns=['tasks_set', 'task',
+                                                                                                'task_id', 'grade',
+                                                                                                'subm_time', 'solution','sub_id'])
+        subs_df = subs_df.sort_values('subm_time').groupby('task_id').last()
+        subs_df = subs_df.set_index('sub_id')
+        file_prefix = student.first_name + ' ' +  student.last_name + ' ' + student.patronymic  + ' '
+
+        for ind, row in subs_df.iterrows():
+            fname = file_prefix + row['task']   +u' Id ' + str(ind) + u" .txt"
+
+            with open(os.path.join(dir_with_files_name, fname), "w") as text_file:
+
+                text_file.write(row['solution'].encode('utf-8') )
+
+
+    filenames = [ os.path.join(dir_with_files_name, fname) for fname in os.listdir( dir_with_files_name )]
+
+    zip_subdir = dir_with_files_name
+    zip_filename = "%s.zip" % zip_subdir
+
+    # Open StringIO to grab in-memory ZIP contents
+    s = StringIO.StringIO()
+
+    # The zip compressor
+    zf = zipfile.ZipFile(s, "w")
+
+    for fpath in filenames:
+        # Calculate path for file in zip
+        fdir, fname = os.path.split(fpath)
+        zip_path = os.path.join(zip_subdir, fname)
+
+        # Add file, at correct path
+        zf.write(fpath, zip_path)
+
+    # Must close zip for all contents to be written
+    zf.close()
+
+    # Grab ZIP file from in-memory, make response with correct MIME-type
+    resp = HttpResponse(s.getvalue(), content_type = "application/x-zip-compressed")
+    # ..and correct content-disposition
+    resp['Content-Disposition'] = 'attachment; filename=%s' % zip_filename
+
+    return resp
+
+
+
+
+name_cols_to_viz = {'first_name': u'Имя',
+             'last_name': u'Фамилия',
+             'patronymic': u'Отчество',}
 
 Row_tasks_list = collections.namedtuple('Row_tasks_list','task task_id tasks_set grade deadline1 deadline2')
 Row_tasks_list_prof = collections.namedtuple('Row_tasks_list_prof','task task_id tasks_set grade deadline1 deadline2 first_name last_name patronymic')
@@ -184,7 +281,7 @@ def prof_home(request):
 def group_details(request, group_id):
     try:
         group = Student_group.objects.get(id = group_id)
-    except Task.DoesNotExist:
+    except Student_group.DoesNotExist:
         raise Http404
 
     tasks = Task.objects.all()
@@ -276,25 +373,29 @@ def group_details(request, group_id):
     transformed = out_df.pivot(index='student_id', columns='task_id', values='grade')
     task_final_names =  task_df.set_index('task_id').apply(lambda x: x.tasks_set + ' '+ x.task, 1)
 
-    transformed.columns = [task_final_names[x] if x in task_final_names.index else x for x in transformed.columns ]
     out_df = pd.merge(students_df, transformed, left_on='student_id', right_index=True, how='inner')
 
     out_df = out_df.drop(['student_id', 'dumm'], 1)
     out_df = out_df.sort_values(['last_name'])
-    # print(task_df)
-    return render(request, 'contest/group_details.html', {'tasks': out_df,
+
+    viz_names = []
+    for x in out_df.columns:
+        if x in task_final_names.index:
+            viz_names.append((x, task_final_names[x], True))
+        elif x in name_cols_to_viz:
+            viz_names.append((x, name_cols_to_viz[x], False))
+        else:
+            viz_names.append((x, x, False))
+
+
+    tasks_sets = task_df.groupby(['tasks_set_id', 'tasks_set']).first().index.tolist()
+    return render(request, 'contest/group_details.html', {'tasks_sets':tasks_sets,
+                                                            'tasks': out_df,
+                                                          'group_id':group_id,
+                                                          'col_names':viz_names,
                                                        'username': auth.get_user(request).username,
                                                        'subs': subs})
 
-
-
-
-
-
-
-
-    return render(request, 'contest/message.html',
-           {'message': u'Группа найдена'})
 
 
 
@@ -321,8 +422,66 @@ def home(request):
 
     return render(request, 'contest/prof_home.html', {'username': auth.get_user(request).username,})
 
-
 @login_required(login_url='/auth/login')
+def add_evals(request, group_id, task_id):
+    curr_user = auth.get_user(request)
+    try:
+        student = Students_profile.objects.get(system_user=curr_user)
+        if student:
+            return redirect('tasks_list')
+    except Students_profile.DoesNotExist:
+        try:
+            prof = Professor_profile.objects.get(system_user=curr_user)
+        except Professor_profile.DoesNotExist:
+            return redirect('/auth/logout')
+            raise Http404
+
+    try:
+        group = Student_group.objects.get(id=group_id)
+    except Student_group.DoesNotExist:
+        raise Http404
+
+    try:
+        task = Task.objects.get(id=task_id)
+    except Task.DoesNotExist:
+        raise Http404
+
+    if request.method == 'POST':
+        form = AddUsersForm(request.POST)
+        if form.is_valid():
+            csv_str = form.cleaned_data.get('table')
+            # now in the object cd, you have the form as a dictionary.
+            df = pd.read_csv(StringIO(csv_str), sep="\t")
+            df.columns = [i.decode('utf-8') for i in df.columns.tolist()]
+
+            if not set([u'Id решения', u'Оценка']) <= set(df.columns.tolist()):
+                return render(request, 'contest/message.html',
+                              {'message': u'Введенные данные некорректны. Нет необходимых колонок.'})
+
+            if df[u'Id решения'].unique().shape[0] != df[u'Id решения'].shape[0]:
+                return render(request, 'contest/message.html',
+                              {'message': u'Введенные данные некорректны. Номера студентов не уникальны.'})
+
+            for ind, row in df.iterrows():
+
+                try:
+                    subm = Task_submission.objects.get(id = row[u'Id решения'])
+                except Task_submission.DoesNotExist:
+                    continue
+
+                grade = SubmissionGrade(task_subm=subm,
+                                        evaluation_date=timezone.now(),
+                                        person = prof,
+                                        grade = row[u'Оценка'])
+                grade.save()
+            return render(request, 'contest/message.html', {'message': u'Пользователи созданы успешно'})
+    else:
+        form = AddUsersForm()
+
+    return render(request, 'contest/add_grades.html', {'username': auth.get_user(request).username,
+                                                         'form': form})
+
+
 def add_students(request):
     curr_user = auth.get_user(request)
 

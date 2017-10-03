@@ -4,8 +4,12 @@
 <table>
   <thead>
     <tr>
-        {% for colname in tasks.columns %}
-          <th width="200">{{colname}}</th>
+        {% for col_id, viz_name, is_task_ref in col_names %}
+          {% if  is_task_ref %}
+              <td><p><a href ="{% url 'add_evals' group_id col_id%}">{{viz_name}}</p></td>
+          {% else %}
+                <th width="200">{{viz_name}}</th>
+          {% endif %}
        {% endfor %}
     </tr>
   </thead>
@@ -22,6 +26,12 @@
 
   </tbody>
 </table>
+
+Скачать решения:
+{% for tasks_set_id, tasks_set_name in tasks_sets %}
+   <p><a href ="{% url 'get_subms' group_id tasks_set_id%}">{{tasks_set_name}} </p>
+{% endfor %}
+
 
 
 {% endblock %}

@@ -1,0 +1,11 @@
+{% extends 'contest/main.html' %}
+{% block content %}
+    <form method="POST" class="post-form">
+            Скопируйте таблицу с оценками из Excel.
+
+        Обязательные колонки: Id решения, Оценка.
+            {{ form.as_p }}
+        <input type="submit" class="button" value="Сохранить оценки">
+        </form>
+    </form>
+{% endblock %}
