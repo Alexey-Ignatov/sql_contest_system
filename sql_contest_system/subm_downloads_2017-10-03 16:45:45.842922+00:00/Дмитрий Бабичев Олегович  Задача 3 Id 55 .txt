@@ -1,7 +1,0 @@
-SELECT age, COUNT(customer_rk) FROM
-	(SELECT DISTINCT customer_rk, FLOOR(DATEDIFF(CURDATE(), birth_dt) / 365.25) AS age
-	FROM srcdt.cd_customers) AS A
-	WHERE age >= 15
-    AND age <= 80
-GROUP BY age
-ORDER BY age DESC;

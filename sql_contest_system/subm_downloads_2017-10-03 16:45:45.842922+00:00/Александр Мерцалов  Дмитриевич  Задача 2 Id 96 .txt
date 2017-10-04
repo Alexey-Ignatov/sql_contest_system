@@ -1,6 +1,0 @@
-use srcdt;
-
-select substr(birth_dt, 1, 4) as year, sum(1) from 
-(select customer_rk, birth_dt, sum(monthly_income_amt=50000) as i1,  sum(monthly_income_amt=60000) as i2  from cd_customers group by customer_rk, birth_dt) T1
-where i1 > 0 and i2 > 0 and birth_dt is not null
-group by year

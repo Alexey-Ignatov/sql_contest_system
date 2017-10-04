@@ -1,5 +1,0 @@
-SELECT DISTINCT
-    CONCAT(SUBSTR(YEAR(birth_dt), 1, 3), '0-е') AS generation
-FROM
-    srcdt.cd_customers
-ORDER BY generation DESC

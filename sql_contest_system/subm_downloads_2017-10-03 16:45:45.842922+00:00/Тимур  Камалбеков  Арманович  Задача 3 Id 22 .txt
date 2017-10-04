@@ -1,6 +1,0 @@
-USE srcdt;
-
-SELECT age, COUNT(*) AS cnt FROM (
-	SELECT FLOOR(DATEDIFF(CURRENT_DATE, birth_dt) / 365) AS age FROM cd_customers 
-    GROUP BY customer_rk, birth_dt HAVING age BETWEEN 15 AND 80
-) AS tbl GROUP BY age;

@@ -1,4 +1,0 @@
-select count(tmp_table.rk_count) as CONSTANT_CLIENTS_COUNT
-from(select count(customer_rk) as rk_count 
-    from srcdt.cd_customers group by customer_rk) as tmp_table 
-where tmp_table.rk_count = 1;

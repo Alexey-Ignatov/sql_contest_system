@@ -1,7 +1,0 @@
-select count(1)
-from (
-	select count(1) as changes_count
-	from cd_customers
-	group by customer_rk
-) as t1
-where changes_count = 1;

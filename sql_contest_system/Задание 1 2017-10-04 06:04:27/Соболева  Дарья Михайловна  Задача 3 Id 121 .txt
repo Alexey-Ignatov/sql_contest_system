@@ -1,2 +1,0 @@
-select distinct concat(cast(floor(year(birth_dt) / 10) as char), '0-e') GENERATION from srcdt.cd_customers
-order by GENERATION desc;

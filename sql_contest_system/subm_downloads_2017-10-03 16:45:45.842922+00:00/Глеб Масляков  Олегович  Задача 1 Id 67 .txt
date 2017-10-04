@@ -1,5 +1,0 @@
-select count(customer_rk) as customer_const from (
-select customer_rk, count(*) as a from srcdt.cd_customers
-group by customer_rk
-) as t
-where t.a = 1;

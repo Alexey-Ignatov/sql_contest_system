@@ -1,7 +1,0 @@
-select count(1) as cnt
-from (
-	select customer_rk
-	from srcdt.cd_customers
-	group by customer_rk
-	having count(1) = 1
-) as a;

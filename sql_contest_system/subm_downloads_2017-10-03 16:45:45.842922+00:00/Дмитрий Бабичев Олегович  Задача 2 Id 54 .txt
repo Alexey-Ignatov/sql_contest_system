@@ -1,8 +1,0 @@
-SELECT bd_year, COUNT(*) as count FROM (
-	SELECT customer_rk, bd_year, COUNT(*) as c_count FROM (
-		SELECT DISTINCT customer_rk, YEAR(birth_dt) AS bd_year, monthly_income_amt FROM cd_customers
-		WHERE monthly_income_amt = 50000
-		OR monthly_income_amt = 60000) as A
-	GROUP BY A.customer_rk, A.bd_year
-	HAVING c_count = 2) AS B
-GROUP BY B.bd_year;

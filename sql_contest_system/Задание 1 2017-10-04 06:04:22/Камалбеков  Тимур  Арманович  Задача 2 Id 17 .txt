@@ -1,7 +1,0 @@
-USE srcdt;
-
-SELECT monthly_income_amt FROM cd_customers WHERE 2014 BETWEEN
-CAST(SUBSTRING(valid_from_dttm, 1, 4) AS UNSIGNED)
-AND CAST(SUBSTRING(valid_to_dttm, 1, 4) AS UNSIGNED)
-AND monthly_income_amt IS NOT NULL
-ORDER BY monthly_income_amt DESC LIMIT 10;

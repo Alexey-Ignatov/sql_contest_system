@@ -1,8 +1,0 @@
-select
-	timestampdiff(year, birth_dt, curdate()) as age,
-	count(customer_rk) as customers_amount
-from cd_customers
-where year(valid_to_dttm) = 5999
-group by age
-having age between 15 and 80
-order by age desc

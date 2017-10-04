@@ -1,8 +1,0 @@
-select customer_rk, (
-case
-when upper(middle_nm) like '%А' then 'F'
-when upper(middle_nm) is null then null
-else 'M'
-end) as gender
-from srcdt.cd_customers
-where year(valid_to_dttm) = 5999;

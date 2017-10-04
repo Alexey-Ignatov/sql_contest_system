@@ -1,2 +1,0 @@
-SELECT DISTINCT CONCAT(FLOOR(YEAR(birth_dt) / 10) * 10, "-е") AS generation FROM srcdt.cd_customers
-ORDER BY generation DESC;

@@ -1,4 +1,0 @@
-SELECT COUNT(*) FROM (
-	SELECT customer_rk, COUNT(*) AS COUNT FROM cd_customers
-	GROUP BY customer_rk
-	HAVING COUNT = 1) AS A;

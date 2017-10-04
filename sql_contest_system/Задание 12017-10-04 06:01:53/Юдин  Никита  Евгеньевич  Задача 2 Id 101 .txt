@@ -1,7 +1,0 @@
-select (case
-            when year(valid_to_dttm) = 2014 then monthly_income_amt
-            when year(valid_from_dttm) = 2014 then monthly_income_amt
-            when (year(valid_from_dttm) < 2014) and (year(valid_to_dttm) > 2014) then monthly_income_amt
-            else null
-        end) as MONTHLY_INCOME_AMT
-from srcdt.cd_customers order by MONTHLY_INCOME_AMT desc limit 10;

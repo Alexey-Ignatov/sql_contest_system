@@ -1,9 +1,0 @@
-SELECT customer_rk,
-	CASE
-	WHEN middle_nm like ('%ИЧ') then 'M'
-    WHEN middle_nm like ('%НА') then 'F'
-    WHEN middle_nm is NULL then NULL
-	END
-as GENDER
-FROM srcdt.cd_customers
-WHERE year(valid_to_dttm) = 5999;

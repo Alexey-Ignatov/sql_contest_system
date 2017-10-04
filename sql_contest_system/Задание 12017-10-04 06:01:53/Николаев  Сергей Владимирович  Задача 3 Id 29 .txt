@@ -1,4 +1,0 @@
-select distinct concat(year(birth_dt) div 10, '0-е') as gen
-from srcdt.cd_customers
-where year(valid_to_dttm) = 5999
-order by gen desc;

@@ -1,4 +1,0 @@
-SELECT customer_rk,
-IF(middle_nm LIKE "%на", 'F', IF(middle_nm LIKE "%ич", 'M', NULL)) AS gender
-FROM srcdt.cd_customers
-WHERE YEAR(valid_to_dttm) = 5999;

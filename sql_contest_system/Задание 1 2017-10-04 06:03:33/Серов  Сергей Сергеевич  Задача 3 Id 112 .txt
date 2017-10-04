@@ -1,3 +1,0 @@
-SELECT distinct concat(year(birth_dt) div 10, '0-е') as generation
-FROM srcdt.cd_customers
-ORDER BY cast(left(generation, length(generation) - 3) as unsigned) DESC;

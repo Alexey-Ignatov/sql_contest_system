@@ -1,9 +1,0 @@
-SELECT
-customer_rk,
-    (case 
-	when substring(middle_nm, length(middle_nm) - 1, 2) = 'ИЧ' then 'M'
-        when substring(middle_nm, length(middle_nm) - 1, 2) = 'НА' then 'F'
-        else null
-    end) AS GENDER
-FROM
-    srcdt.cd_customers

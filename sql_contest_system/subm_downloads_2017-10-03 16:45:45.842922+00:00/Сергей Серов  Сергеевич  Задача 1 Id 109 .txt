@@ -1,6 +1,0 @@
-SELECT count(1) as number_of_clients
-FROM (
-	SELECT customer_rk, count(customer_rk) as counts
-	FROM srcdt.cd_customers
-	GROUP BY customer_rk) as customers_notes_count
-WHERE customers_notes_count.counts = 1;

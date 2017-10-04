@@ -1,8 +1,0 @@
-select year(birth_dt), count(*) from cd_customers
-where customer_rk in (
-	select customer_rk from cd_customers
-	where monthly_income_amt = 50000) and
-    customer_rk in (
-	select customer_rk from cd_customers
-	where monthly_income_amt = 60000)
-group by year(birth_dt)

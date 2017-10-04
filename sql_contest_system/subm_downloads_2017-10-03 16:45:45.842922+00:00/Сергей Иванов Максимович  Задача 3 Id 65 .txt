@@ -1,9 +1,0 @@
-SELECT age, COUNT(*) as num_of_customers
-from
-(
-	SELECT distinct
-	customer_rk, timestampdiff(year, birth_dt, CURDATE()) as age
-	from srcdt.cd_customers
-) as ages
-WHERE (age >= 15 and age <= 80)
-GROUP BY age

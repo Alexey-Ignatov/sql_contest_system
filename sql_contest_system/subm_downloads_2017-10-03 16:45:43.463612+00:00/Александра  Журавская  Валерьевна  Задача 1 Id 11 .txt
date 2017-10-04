@@ -1,7 +1,0 @@
-select distinct customer_rk, 
-case
-	when middle_nm like '%А' then 'F'
-    when middle_nm like '%Ч' then 'M'
-    else 'не знаю'
-end as gender
-from cd_customers

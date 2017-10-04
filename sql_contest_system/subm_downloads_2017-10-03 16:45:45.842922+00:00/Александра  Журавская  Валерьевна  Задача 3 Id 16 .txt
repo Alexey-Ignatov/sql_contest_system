@@ -1,3 +1,0 @@
-select TIMESTAMPDIFF(YEAR,birth_dt,CURDATE()) age,count(distinct customer_rk) clients  from cd_customers
-group by age
-having age>=15 and age<=80

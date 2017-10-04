@@ -1,7 +1,0 @@
-use srcdt;
-select year(birth_dt) as birth_year, count(*) as CNT from(
-select distinct customer_rk, birth_dt from cd_customers 
-where monthly_income_amt in (50000,60000)
-group by customer_rk, birth_dt
-having max(monthly_income_amt)/min(monthly_income_amt) = 6/5) a
-group by birth_year ;

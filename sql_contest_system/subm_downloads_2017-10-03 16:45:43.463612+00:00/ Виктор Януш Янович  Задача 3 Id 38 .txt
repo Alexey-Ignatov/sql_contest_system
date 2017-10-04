@@ -1,4 +1,0 @@
-select distinct
-concat(LEFT(YEAR(birth_dt), 3), '0-е') as generation
-from srcdt.cd_customers
-order by generation desc

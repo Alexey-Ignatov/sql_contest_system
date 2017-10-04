@@ -1,4 +1,0 @@
-use srcdt; 
-select monthly_income_amt from cd_customers 
-where year(valid_from_dttm) <=2014 and year(valid_to_dttm)>=2014 
-order by monthly_income_amt desc limit 10;

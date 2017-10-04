@@ -1,5 +1,0 @@
-select monthly_income_amt
-from srcdt.cd_customers
-where 2014 between year(valid_from_dttm) and year(valid_to_dttm)
-order by monthly_income_amt desc
-limit 10;
