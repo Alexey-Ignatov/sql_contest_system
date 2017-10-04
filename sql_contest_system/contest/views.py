@@ -158,7 +158,7 @@ def tasks_list(request):
     for sub in subs:
         try:
             grade = SubmissionGrade.objects.get(task_subm = sub).grade
-        except Task_submission.DoesNotExist:
+        except SubmissionGrade.DoesNotExist:
             grade = u'На проверке'
 
         sub_dict = {
