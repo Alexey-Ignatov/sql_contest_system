@@ -58,8 +58,6 @@ def get_subms(request, group_id, tasks_set_id):
         for sub in subs:
             if sub.task.module_task_set == tasks_set:
 
-                Task_submission.objects.filter(student=student, task=task).exists()
-
                 sub_dict = {
                     'tasks_set': sub.task.module_task_set.title,
                     'task': sub.task.title,
@@ -94,7 +92,7 @@ def get_subms(request, group_id, tasks_set_id):
     zip_filename = "%s.zip" % zip_subdir
 
     # Open StringIO to grab in-memory ZIP contents
-    s = StringIO.StringIO()
+    s = StringIO()
 
     # The zip compressor
     zf = zipfile.ZipFile(s, "w")
