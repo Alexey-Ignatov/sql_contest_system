@@ -1,0 +1,6 @@
+select year(birth_dt) as birth_year, count(*) as cnt from
+	(select distinct customer_rk, birth_dt from srcdt.cd_customers
+    where customer_rk in (select distinct customer_rk from srcdt.cd_customers where monthly_income_amt = 50000)
+    and customer_rk in (select distinct customer_rk from srcdt.cd_customers where monthly_income_amt = 60000)
+	) a
+group by birth_year;

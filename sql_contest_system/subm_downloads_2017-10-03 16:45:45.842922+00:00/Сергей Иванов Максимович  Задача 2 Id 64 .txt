@@ -1,0 +1,9 @@
+SELECT YEAR(birth_dt) as birthyear, COUNT(distinct customer_rk) as num_of_customers
+from srcdt.cd_customers
+WHERE monthly_income_amt = 50000 AND customer_rk in
+(
+	SELECT distinct customer_rk
+    from srcdt.cd_customers
+    where monthly_income_amt = 60000
+)
+GROUP BY birthyear

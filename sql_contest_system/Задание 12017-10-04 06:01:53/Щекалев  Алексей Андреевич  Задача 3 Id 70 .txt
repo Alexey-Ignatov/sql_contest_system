@@ -1,0 +1,18 @@
+select distinct
+    (case
+      when year(birth_dt) <= 1909 and year(birth_dt) >= 1900 then '1900-е'
+      when year(birth_dt) <= 1919 and year(birth_dt) >= 1910 then '1910-е'
+      when year(birth_dt) <= 1929 and year(birth_dt) >= 1920 then '1920-е'
+      when year(birth_dt) <= 1939 and year(birth_dt) >= 1930 then '1930-е'
+      when year(birth_dt) <= 1949 and year(birth_dt) >= 1940 then '1940-е'
+      when year(birth_dt) <= 1959 and year(birth_dt) >= 1950 then '1950-е'
+      when year(birth_dt) <= 1969 and year(birth_dt) >= 1960 then '1960-е'
+      when year(birth_dt) <= 1979 and year(birth_dt) >= 1970 then '1970-е'
+      when year(birth_dt) <= 1989 and year(birth_dt) >= 1980 then '1980-е'
+      when year(birth_dt) <= 1999 and year(birth_dt) >= 1990 then '1990-е'
+      when year(birth_dt) <= 2009 and year(birth_dt) >= 2000 then '2000-е'
+      when year(birth_dt) <= 2019 and year(birth_dt) >= 2010 then '2010-е'
+    end) as generation
+    
+from srcdt.cd_customers
+order by generation desc

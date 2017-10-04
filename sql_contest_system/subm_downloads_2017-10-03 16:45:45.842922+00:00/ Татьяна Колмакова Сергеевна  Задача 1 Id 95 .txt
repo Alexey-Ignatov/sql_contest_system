@@ -1,0 +1,8 @@
+select count(*) as num from
+(
+	select 
+		sum(1) as num_records
+	from srcdt.cd_customers
+	group by customer_rk
+) tab
+where num_records = 1

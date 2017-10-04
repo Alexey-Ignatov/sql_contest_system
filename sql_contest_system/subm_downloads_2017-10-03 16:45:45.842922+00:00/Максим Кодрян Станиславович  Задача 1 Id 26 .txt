@@ -1,0 +1,5 @@
+select count(*) as unchanged_count from
+	(select customer_rk
+	from srcdt.cd_customers
+	group by customer_rk
+	having count(*) = 1) a;

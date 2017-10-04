@@ -1,0 +1,12 @@
+use srcdt;
+
+select TimestampDiff(year, birth_dt, curdate()) as cur_year, count(distinct(customer_rk)) as cnt
+from cd_customers
+where 
+		birth_dt is not null 
+        and
+		TimestampDiff(year, birth_dt, curdate()) >= 15 
+	and 
+		TimestampDiff(year, birth_dt, curdate()) <= 80
+group by cur_year
+order by cur_year desc;

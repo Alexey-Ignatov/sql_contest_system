@@ -1,0 +1,9 @@
+use srcdt;
+
+select sum(1)
+from (
+	select 
+		sum(1) as cnt
+	from cd_customers
+	group by CUSTOMER_RK
+) as T where cnt = 1;

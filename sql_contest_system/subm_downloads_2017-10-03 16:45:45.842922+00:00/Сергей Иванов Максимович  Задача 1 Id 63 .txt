@@ -1,0 +1,8 @@
+SELECT count(*) as result
+from
+(
+	SELECT customer_rk, count(*) as cnt
+	from srcdt.cd_customers
+	group by customer_rk
+	having cnt = 1
+) as cnts

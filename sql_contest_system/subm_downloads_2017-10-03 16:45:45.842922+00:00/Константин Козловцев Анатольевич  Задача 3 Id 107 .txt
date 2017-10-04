@@ -1,0 +1,10 @@
+select age, count(1)
+from (
+	select 
+		max(year(subdate(sysdate(), to_days(birth_dt)))) as age
+	from cd_customers
+	group by customer_rk
+) as t1
+where age between 15 and 80
+group by age
+order by age desc;

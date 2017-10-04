@@ -1,0 +1,10 @@
+SELECT 
+    COUNT(number_of_changes)
+FROM
+    (SELECT 
+        customer_rk, COUNT(customer_rk) AS number_of_changes
+    FROM
+        cd_customers
+    GROUP BY customer_rk) AS t
+WHERE
+    number_of_changes = 1

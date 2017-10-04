@@ -1,0 +1,6 @@
+select age, count(1)
+from
+(select distinct customer_rk, timestampdiff(year, birth_dt, curdate()) as age
+from srcdt.cd_customers having age <=80 and age >=15) as a
+group by age
+order by age desc;

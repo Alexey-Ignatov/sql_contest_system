@@ -1,0 +1,24 @@
+USE srcdt;
+
+SELECT customer_rk,
+CASE WHEN
+SUBSTR(GROUP_CONCAT(
+	CASE 
+		WHEN middle_nm LIKE '%ИЧ' THEN 'M'
+		WHEN middle_nm LIKE '%НА' THEN 'F'
+		ELSE '_'
+	END
+	ORDER BY valid_from_dttm DESC SEPARATOR ''
+), 1, 1) = '_' 
+THEN NULL
+ELSE
+CAST(SUBSTR(GROUP_CONCAT(
+	CASE 
+		WHEN middle_nm LIKE '%ИЧ' THEN 'M'
+		WHEN middle_nm LIKE '%НА' THEN 'F'
+		ELSE '_'
+	END
+    ORDER BY valid_from_dttm DESC SEPARATOR ''
+), 1, 1) AS CHAR)
+END AS gender
+FROM cd_customers GROUP BY customer_rk;

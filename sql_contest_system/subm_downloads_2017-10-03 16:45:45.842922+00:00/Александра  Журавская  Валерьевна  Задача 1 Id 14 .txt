@@ -1,0 +1,5 @@
+select count(*) from (
+	select customer_rk, count(*) as tmp 
+    from cd_customers
+	group by customer_rk
+	having tmp = 1) table1

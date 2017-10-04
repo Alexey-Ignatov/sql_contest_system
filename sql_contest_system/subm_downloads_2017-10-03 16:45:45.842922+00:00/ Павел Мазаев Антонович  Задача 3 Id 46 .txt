@@ -1,0 +1,7 @@
+select age, count(1) as age_count from (
+  select timestampdiff(year, birth_dt, current_date()) as age from srcdt.cd_customers
+    where year(valid_to_dttm) = 5999
+) getting_age
+where age between 15 and  80
+group by age
+order by age desc;

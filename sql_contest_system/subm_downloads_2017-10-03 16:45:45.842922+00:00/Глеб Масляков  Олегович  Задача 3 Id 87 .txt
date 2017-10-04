@@ -1,0 +1,9 @@
+select age, count(*) as cnt from (
+select (
+    (year(current_date()) - year(birth_dt)) -                           
+    (date_format(current_date(), '%m%d') < date_format(birth_dt, '%m%d'))
+) as age from srcdt.cd_customers
+where year(valid_to_dttm) = 5999) as t
+where age < 81 and age > 14
+group by age
+order by age desc;

@@ -1,0 +1,5 @@
+select tmp_table._age as AGE, count(tmp_table.customer_rk) as CLIENTS_COUNT
+from(select customer_rk, timestampdiff(year, birth_dt, curdate()) as _age
+    from srcdt.cd_customers where year(valid_to_dttm) = 5999) as tmp_table
+where tmp_table._age between 15 and 80
+group by tmp_table._age order by tmp_table._age desc;

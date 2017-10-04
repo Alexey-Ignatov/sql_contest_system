@@ -1,0 +1,10 @@
+SELECT 
+    customer_rk, (
+    case substring(middle_nm, -1, 1)
+		when  'Ч' then 'M'
+		when  'А' then 'F'
+        else Null
+	end) as gender
+FROM
+    srcdt.cd_customers
+where valid_to_dttm = '5999-01-01 00:00:00'

@@ -1,0 +1,9 @@
+select
+	count(cnt_rk) as unique_customers_cnt
+from (
+	select
+		customer_rk,
+		count(1) as cnt_rk
+	from cd_customers
+	group by customer_rk) as T
+where cnt_rk = 1

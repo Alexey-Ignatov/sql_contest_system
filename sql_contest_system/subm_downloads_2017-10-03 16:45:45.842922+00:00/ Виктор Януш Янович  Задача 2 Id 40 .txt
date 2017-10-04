@@ -1,0 +1,13 @@
+select birth_year, count(1) from (
+	select distinct customer_rk, YEAR(birth_dt) as birth_year
+	from srcdt.cd_customers
+	where customer_rk in (
+		select customer_rk
+		from srcdt.cd_customers
+		where monthly_income_amt in (50000, 60000)
+		group by customer_rk
+		having count(distinct monthly_income_amt) >= 2
+		)
+	) as T
+group by birth_year
+order by birth_year asc

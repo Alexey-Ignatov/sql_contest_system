@@ -1,0 +1,10 @@
+select distinct
+customer_rk,
+(
+	case
+		when RIGHT(middle_nm, 2) = 'ИЧ' then 'M'
+		when RIGHT(middle_nm, 2) = 'НА' then 'F'
+        else null
+	end
+) as gender
+from srcdt.cd_customers

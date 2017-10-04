@@ -1,0 +1,3 @@
+use srcdt;
+SELECT age, count(*) as CNT from( select distinct customer_rk, TIMESTAMPDIFF(YEAR,birth_dt,CURDATE()) as age
+FROM cd_customers having age <=80 and age >=15) a group by age desc;

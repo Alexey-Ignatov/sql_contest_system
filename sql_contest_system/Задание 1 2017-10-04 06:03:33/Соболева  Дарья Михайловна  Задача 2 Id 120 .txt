@@ -1,0 +1,3 @@
+select monthly_income_amt from srcdt.cd_customers
+where (2014 >= year(valid_from_dttm)) and (2014 <= year(valid_to_dttm))
+order by monthly_income_amt desc limit 10;

@@ -1,0 +1,8 @@
+USE srcdt;
+
+SELECT birth_date, COUNT(*) AS cnt FROM (
+	SELECT birth_date FROM (
+		SELECT customer_rk, SUBSTR(birth_dt, 1, 4) AS birth_date, monthly_income_amt = 50000 AS has_50k, 
+		monthly_income_amt = 60000 AS has_60k FROM cd_customers WHERE monthly_income_amt IS NOT NULL
+	) AS tbl1 GROUP BY customer_rk, birth_date HAVING SUM(has_50k) > 0 AND SUM(has_60k) > 0
+) AS tbl2 GROUP BY birth_date;

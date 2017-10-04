@@ -1,0 +1,6 @@
+select AGE, count(*) as COUNT from (
+	select distinct customer_rk, timestampdiff(year, birth_dt, now()) as AGE from srcdt.cd_customers
+    ) a
+    where (AGE >= 15) and (AGE <= 80)
+    group by AGE
+    order by AGE desc;

@@ -1,0 +1,10 @@
+use srcdt;
+select 
+	CUSTOMER_RK,  
+	case (first_nm REGEXP '.*А$' )
+		when 0 then 'M'
+        when 1 then 'F'
+        when NULL then NULL
+	end as gender
+from cd_customers
+where valid_to_dttm = '5999-01-01 00:00:00';

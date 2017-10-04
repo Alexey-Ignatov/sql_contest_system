@@ -1,0 +1,18 @@
+use srcdt;
+select (
+case
+when year(birth_dt) like "190%" then "1900-e"
+when year(birth_dt) like "191%" then "1910-e"
+when year(birth_dt) like "192%" then "1920-e"
+when year(birth_dt) like "193%" then "1930-e"
+when year(birth_dt) like "194%" then "1940-e"
+when year(birth_dt) like "195%" then "1950-e"
+when year(birth_dt) like "196%" then "1960-e"
+when year(birth_dt) like "197%" then "1970-e"
+when year(birth_dt) like "198%" then "1980-e"
+when year(birth_dt) like "199%" then "1990-e"
+when year(birth_dt) like "200%" then "2000-e"
+when year(birth_dt) like "201%" then "2010-e"
+end
+) as generation, count(*) as CNT
+FROM cd_customers where year(valid_to_dttm) = 5999 group by generation desc;

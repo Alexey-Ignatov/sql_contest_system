@@ -1,0 +1,7 @@
+select count(1)
+from (
+select customer_rk, count(1) as cnt_notes
+from srcdt.cd_customers
+group by customer_rk
+having cnt_notes = 1
+) as customer_table;

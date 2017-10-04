@@ -1,0 +1,8 @@
+select CUSTOMER_RK,
+	   case substring(middle_nm, -2) 
+          when "ИЧ" then "М"
+          when "НА" then "Ж"
+          else NULL
+        end as GENDER
+from srcdt.cd_customers
+where year(valid_to_dttm) = 5999;

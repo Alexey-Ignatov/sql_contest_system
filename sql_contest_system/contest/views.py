@@ -28,7 +28,6 @@ else:
 
 import os
 import zipfile
-import StringIO
 
 from django.http import HttpResponse
 
@@ -49,34 +48,35 @@ def get_subms(request, group_id, tasks_set_id):
 
 
     students = Students_profile.objects.filter(student_group=group)
-    dir_with_files_name ='./subm_downloads_' + str(timezone.now())
+    dir_with_files_name =tasks_set.title +' ' +str(timezone.now())[:-13]
     os.mkdir(dir_with_files_name)
 
-
+    all_sub_ids = []
     for student in students:
         subs = Task_submission.objects.filter(student=student)
-
         subs_info_list = []
         for sub in subs:
             if sub.task.module_task_set == tasks_set:
+
+                Task_submission.objects.filter(student=student, task=task).exists()
+
                 sub_dict = {
                     'tasks_set': sub.task.module_task_set.title,
                     'task': sub.task.title,
                     'task_id': sub.task.id,
-                    'grade': sub.evaluation.grade if sub.evaluation else u'Не проверено',
                     'subm_time': sub.subm_time,
                     'solution': sub.solution,
                     'sub_id':sub.id
                 }
                 subs_info_list.append(sub_dict)
-
+                all_sub_ids.append(sub.id)
 
         subs_df = pd.DataFrame(subs_info_list) if subs_info_list else pd.DataFrame([], columns=['tasks_set', 'task',
                                                                                                 'task_id', 'grade',
                                                                                                 'subm_time', 'solution','sub_id'])
         subs_df = subs_df.sort_values('subm_time').groupby('task_id').last()
         subs_df = subs_df.set_index('sub_id')
-        file_prefix = student.first_name + ' ' +  student.last_name + ' ' + student.patronymic  + ' '
+        file_prefix =student.last_name + ' ' +  student.first_name + ' ' +  student.patronymic  + ' '
 
         for ind, row in subs_df.iterrows():
             fname = file_prefix + row['task']   +u' Id ' + str(ind) + u" .txt"
@@ -86,6 +86,8 @@ def get_subms(request, group_id, tasks_set_id):
                 text_file.write(row['solution'].encode('utf-8') )
 
 
+    pd.DataFrame([[i, -1] for i in all_sub_ids], columns = [u'Id решения', u'Оценка'])\
+                                            .to_excel(os.path.join(dir_with_files_name, 'form_to_submit.xls'), index = False)
     filenames = [ os.path.join(dir_with_files_name, fname) for fname in os.listdir( dir_with_files_name )]
 
     zip_subdir = dir_with_files_name
@@ -130,7 +132,7 @@ def tasks_list(request):
 
     try:
         student = Students_profile.objects.get(system_user=curr_user)
-    except Students_profile.DoesNotExist:
+    except SubmissionGrade.DoesNotExist:
         raise Http404
 
 
@@ -156,11 +158,16 @@ def tasks_list(request):
 
     subs_info_list = []
     for sub in subs:
+        try:
+            grade = SubmissionGrade.objects.get(task_subm = sub).grade
+        except Task_submission.DoesNotExist:
+            grade = u'На проверке'
+
         sub_dict = {
             'tasks_set':sub.task.module_task_set.title,
             'task':sub.task.title,
             'task_id': sub.task.id,
-            'grade':sub.evaluation.grade if sub.evaluation else u'На проверке',
+            'grade':grade,
             'subm_time':sub.subm_time
         }
         subs_info_list.append(sub_dict)
@@ -317,11 +324,16 @@ def group_details(request, group_id):
 
     subs_info_list = []
     for sub in subs:
+        try:
+            grade = SubmissionGrade.objects.get(task_subm = sub).grade
+        except SubmissionGrade.DoesNotExist:
+            grade = u'На проверке'
+
         sub_dict = {
             'tasks_set': sub.task.module_task_set.title,
             'task': sub.task.title,
             'task_id': sub.task.id,
-            'grade': sub.evaluation.grade if sub.evaluation else u'На проверке',
+            'grade': grade,
             'subm_time': sub.subm_time,
             'student_id': sub.student.id
         }
@@ -474,7 +486,7 @@ def add_evals(request, group_id, task_id):
                                         person = prof,
                                         grade = row[u'Оценка'])
                 grade.save()
-            return render(request, 'contest/message.html', {'message': u'Пользователи созданы успешно'})
+            return render(request, 'contest/message.html', {'message': u'Оценки заданы успешно'})
     else:
         form = AddUsersForm()
 

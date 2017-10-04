@@ -1,0 +1,8 @@
+select customer_rk, 
+(
+	case 
+		when middle_nm like ('%на') then 'F'
+		when middle_nm like ('%ич') then 'M'
+	END
+) as gender  from srcdt.cd_customers
+where year(valid_to_dttm) = 5999;

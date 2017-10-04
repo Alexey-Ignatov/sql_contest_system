@@ -1,0 +1,5 @@
+SELECT monthly_income_amt
+FROM srcdt.cd_customers
+WHERE 2014 between year(valid_from_dttm) and year(valid_to_dttm)
+ORDER BY monthly_income_amt DESC
+LIMIT 10;

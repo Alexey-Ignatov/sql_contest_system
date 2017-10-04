@@ -1,0 +1,9 @@
+select year(birth_dt) as YEAR_BIRTH_DT, count(distinct t1.customer_rk) as COUNT from (
+	select customer_rk,
+		   sum(case when monthly_income_amt = 50000 then 1 else 0 end) as sum_monthly_income_amt_50K,
+		   sum(case when monthly_income_amt = 60000 then 1 else 0 end) as sum_monthly_income_amt_60K
+	from srcdt.cd_customers
+    group by customer_rk
+    )t1 left join srcdt.cd_customers t2 on t1.customer_rk = t2.customer_rk
+    where (sum_monthly_income_amt_50K >= 1) and (sum_monthly_income_amt_60K >= 1)
+    group by year(birth_dt);

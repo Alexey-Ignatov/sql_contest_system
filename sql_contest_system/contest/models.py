@@ -122,7 +122,7 @@ class Task_submission(models.Model):
     student = models.ForeignKey(verbose_name=u'Студент', to=Students_profile)
 
     solution = models.TextField(verbose_name=u'Решение')
-    evaluation = models.PositiveIntegerField( verbose_name=u'Оценка',blank=True, null=True)
+    #evaluation = models.ForeignKey(verbose_name=u'Оценка',blank=True, null=True)
     subm_time = models.DateTimeField(verbose_name=u'Время отправки')
 
     class Meta:
@@ -150,4 +150,4 @@ class SubmissionGrade(models.Model):
         verbose_name_plural = u'Оценки'
 
     def __unicode__(self):
-        return self.task_subm.__unicode__() + ' ' + self.evaluation_date.__unicode__()
+        return self.task_subm.__unicode__()

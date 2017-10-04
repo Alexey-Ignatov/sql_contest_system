@@ -1,0 +1,2 @@
+select distinct concat(cast((year(birth_dt) div 10) * 10 as char), '-е') as GENERATIONS
+from srcdt.cd_customers order by GENERATIONS desc;

@@ -1,0 +1,3 @@
+use srcdt;
+select sum(CNT) as number_of_clients from(
+select customer_rk,count(*) as CNT FROM cd_customers group by customer_rk having CNT=1) a;

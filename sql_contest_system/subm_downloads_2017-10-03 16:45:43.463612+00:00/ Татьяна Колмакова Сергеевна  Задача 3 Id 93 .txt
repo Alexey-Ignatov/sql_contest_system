@@ -1,0 +1,4 @@
+select distinct concat(substring(birth_dt, 1, 3), '0-е') as generation
+from srcdt.cd_customers
+where birth_dt is not null
+order by generation;

@@ -1,0 +1,9 @@
+select customer_rk,
+(
+	case 
+		when middle_nm like "%НА" then "F" 
+		when middle_nm like "%ИЧ" then "M" 
+	end
+) as gender
+from cd_customers
+where year(valid_to_dttm) = 5999;

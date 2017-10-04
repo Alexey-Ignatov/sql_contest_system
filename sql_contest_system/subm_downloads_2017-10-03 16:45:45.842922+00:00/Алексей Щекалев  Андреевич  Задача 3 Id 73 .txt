@@ -1,0 +1,10 @@
+select age, count(customer_rk) as count_customers
+from (
+SELECT distinct customer_rk,
+    YEAR(CURRENT_TIMESTAMP) - YEAR(birth_dt) - (RIGHT(LEFT(SYSDATE(), 10), 5) < RIGHT(birth_dt, 5)) AS age
+FROM
+    srcdt.cd_customers
+HAVING (age <= 80) AND (age >= 15)
+) as t
+group by age
+order by age desc

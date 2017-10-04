@@ -1,0 +1,20 @@
+select
+	birth_year,
+	count(1) as cnt
+from (
+	select
+		customer_rk, 
+		min(birth_year) as birth_year
+	from (
+		select 
+			customer_rk, 
+			monthly_income_amt = 50000 as a,
+			monthly_income_amt = 60000 as b,
+			year(birth_dt) as birth_year
+		from srcdt.cd_customers
+	) as tmp
+	group by customer_rk
+	having bit_or(a) and bit_or(b)
+) as tmp2
+group by birth_year
+order by birth_year;

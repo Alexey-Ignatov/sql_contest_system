@@ -1,0 +1,19 @@
+select
+	year(birth_dt) as birth_year,
+        count(1) as customers_amount
+from cd_customers
+where customer_rk in (
+	select customer_rk from (
+		select
+			customer_rk,
+			min(monthly_income_amt) as min_income,
+			max(monthly_income_amt) as max_income
+		from cd_customers
+		where monthly_income_amt in (50000, 60000)
+		group by customer_rk
+		having min_income = 50000 and max_income = 60000
+	) as T
+) and year(valid_to_dttm) = 5999
+
+group by birth_year
+order by birth_year asc
