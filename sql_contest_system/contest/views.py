@@ -158,6 +158,7 @@ def tasks_list(request):
     for sub in subs:
         try:
             grade = SubmissionGrade.objects.get(task_subm = sub).grade
+            grade = int(grade >= 8) if grade != -1 else u'На проверке'
         except SubmissionGrade.DoesNotExist:
             grade = u'На проверке'
 
@@ -477,6 +478,9 @@ def add_evals(request, group_id, task_id):
                 try:
                     subm = Task_submission.objects.get(id = row[u'Id решения'])
                 except Task_submission.DoesNotExist:
+                    continue
+
+                if row[u'Оценка'] == -1:
                     continue
 
                 grade = SubmissionGrade(task_subm=subm,
